@@ -154,7 +154,15 @@ public class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGe
     /// Property to check video recording file size when in progress
     public var recordedFileSize : Int64 { return movieOutput?.recordedFileSize ?? 0 }
 
-    
+    /// Property to lock orientation
+    public var lockedVideoOrientation : AVCaptureVideoOrientation? {
+      didSet {
+        if cameraIsSetup {
+          _orientationChanged()
+        }
+      }
+    }
+  
     // MARK: - Private properties
 
     private weak var embeddingView: UIView?
@@ -646,6 +654,10 @@ public class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGe
     }
 
     private func _currentVideoOrientation() -> AVCaptureVideoOrientation {
+        if let lockedVideoOrientation = lockedVideoOrientation {
+            return lockedVideoOrientation
+        }
+      
         switch UIDevice.currentDevice().orientation {
         case .LandscapeLeft:
             return .LandscapeRight
